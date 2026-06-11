@@ -1,7 +1,10 @@
 {
-  "name": "componetui",
-  "version": "0.1.0",
-  "private": true,
+  "name": "gamin-ui",
+  "version": "1.0.0",
+  "files": [
+    "bin",
+    "registry"
+  ],
   "scripts": {
     "dev": "next dev",
     "build": "next build",

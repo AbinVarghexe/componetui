@@ -3,6 +3,7 @@
 [![CI](https://github.com/AbinVarghexe/componetui/actions/workflows/ci.yml/badge.svg)](https://github.com/AbinVarghexe/componetui/actions/workflows/ci.yml)
 [![GitHub stars](https://img.shields.io/github/stars/AbinVarghexe/componetui.svg?style=social)](https://github.com/AbinVarghexe/componetui/stargazers)
 [![Vercel Deployment](https://img.shields.io/badge/Vercel-Deployed-black?logo=vercel)](https://vercel.com)
+[![Sponsor](https://img.shields.io/badge/Sponsor-GitHub%20Sponsors-ea4aaa?logo=github-sponsors)](https://github.com/sponsors/AbinVarghexe)
 
 Source-first UI registry for creative developers. Gamin UI distributes components as editable React source code directly into local workspaces via CLI.
 
@@ -108,4 +109,11 @@ pnpm run release:check
 ## Contributing
 
 We welcome contributions from the community! Please read our [Contributing Guide](CONTRIBUTING.md) to learn about our branching model, local development workflows, code standards, and how to submit pull requests.
+
+## Support & Sponsorship
+
+If Gamin UI helps speed up your development or you want to support our open-source efforts, please consider sponsoring the project:
+
+- **GitHub Sponsors**: [Sponsor @AbinVarghexe](https://github.com/sponsors/AbinVarghexe)
+- Star this repository to help others discover Gamin UI!
 

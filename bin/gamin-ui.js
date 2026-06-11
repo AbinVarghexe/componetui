@@ -4,10 +4,78 @@ const path = require('path')
 
 function usage() {
   console.log('gamin-ui CLI\n')
-  console.log('Usage: gamin-ui add <component-id> [--dest <project-path>]')
+  console.log('Usage: gamin-ui add <component-id> [--dest <project-path>] [--install]')
   console.log('       gamin-ui search <query>')
   console.log('       gamin-ui upgrade [component-id] [--dest <project-path>] [--all] [--check] [--install]')
+  console.log('       gamin-ui mcp')
   process.exit(1)
+}
+
+async function addComponent(comp, dest, installFlag, logger = console.log, stdioOpt = 'inherit') {
+  const registryDir = path.resolve(__dirname, '..', 'registry')
+  const compDir = resolveRegistryPath(registryDir, comp)
+  if (!fs.existsSync(compDir)) {
+    throw new Error(`Component not found in local registry: ${comp}`)
+  }
+
+  const metadataPath = path.join(compDir, 'metadata.json')
+  if (!fs.existsSync(metadataPath)) {
+    throw new Error(`metadata.json missing for ${comp}`)
+  }
+
+  const metadata = JSON.parse(fs.readFileSync(metadataPath, 'utf8'))
+  const files = Array.isArray(metadata.files) && metadata.files.length 
+    ? metadata.files 
+    : fs.readdirSync(compDir).filter(f => f.endsWith('.tsx') || f.endsWith('.jsx') || f.endsWith('.ts') || f.endsWith('.js'))
+
+  const outDir = path.join(dest, 'components', comp)
+  fs.mkdirSync(outDir, { recursive: true })
+
+  const copiedFiles = []
+  for (const fname of files) {
+    const src = path.join(compDir, fname)
+    const destPath = path.join(outDir, fname)
+    if (!fs.existsSync(src)) {
+      logger(`Skipping missing file: ${fname}`)
+      continue
+    }
+    if (fs.existsSync(destPath)) {
+      logger(`Skipping existing file: ${path.relative(dest, destPath)}`)
+      continue
+    }
+    fs.copyFileSync(src, destPath)
+    copiedFiles.push(path.relative(dest, destPath))
+    logger(`Wrote ${path.relative(dest, destPath)}`)
+  }
+
+  // update gamin-ui.json manifest in dest
+  const manifestPath = path.join(dest, 'gamin-ui.json')
+  let manifest = { installed: {} }
+  if (fs.existsSync(manifestPath)) {
+    try { manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8')) } catch (e) { /* ignore */ }
+  }
+  manifest.installed = manifest.installed || {}
+  manifest.installed[comp] = metadata.version || 'unknown'
+  fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2), 'utf8')
+  logger(`Updated manifest: ${path.relative(dest, manifestPath)}`)
+
+  // Optionally install dependencies
+  if (installFlag) {
+    const deps = Array.isArray(metadata.dependencies) ? metadata.dependencies : []
+    if (deps.length > 0) {
+      logger(`Installing dependencies: ${deps.join(', ')}`)
+      try {
+        installDependencies(dest, deps, logger, stdioOpt)
+        logger('Dependencies installed successfully.')
+      } catch (e) {
+        throw new Error(`Dependency installation failed: ${e.message || e}`)
+      }
+    } else {
+      logger(`No dependencies to install for ${comp}`)
+    }
+  }
+
+  return { files: copiedFiles, manifestPath }
 }
 
 async function main() {
@@ -15,75 +83,32 @@ async function main() {
   if (argv.length === 0) return usage()
 
   const cmd = argv[0]
+
+  if (cmd === 'mcp') {
+    const { startMcpServer } = require('./mcp-server')
+    await startMcpServer({
+      addComponent,
+      resolveRegistryPath,
+      detectPackageManager,
+      installDependencies
+    })
+    return
+  }
+
   if (cmd === 'add') {
     const comp = argv[1]
     if (!comp) return usage()
     const destFlagIndex = argv.indexOf('--dest')
     const dest = destFlagIndex !== -1 && argv[destFlagIndex + 1] ? path.resolve(argv[destFlagIndex + 1]) : process.cwd()
-
-    const registryDir = path.resolve(__dirname, '..', 'registry')
-    const compDir = resolveRegistryPath(registryDir, comp)
-    if (!fs.existsSync(compDir)) {
-      console.error('Component not found in local registry:', comp)
-      process.exit(2)
-    }
-
-    const metadataPath = path.join(compDir, 'metadata.json')
-    if (!fs.existsSync(metadataPath)) {
-      console.error('metadata.json missing for', comp)
-      process.exit(3)
-    }
-
-    const metadata = JSON.parse(fs.readFileSync(metadataPath, 'utf8'))
-    const files = Array.isArray(metadata.files) && metadata.files.length ? metadata.files : fs.readdirSync(compDir).filter(f => f.endsWith('.tsx') || f.endsWith('.jsx') || f.endsWith('.ts') || f.endsWith('.js'))
-
-    const outDir = path.join(dest, 'components', comp)
-    fs.mkdirSync(outDir, { recursive: true })
-
-    for (const fname of files) {
-      const src = path.join(compDir, fname)
-      const destPath = path.join(outDir, fname)
-      if (!fs.existsSync(src)) {
-        console.warn('Skipping missing file', fname)
-        continue
-      }
-      if (fs.existsSync(destPath)) {
-        console.log('Skipping existing file', path.relative(dest, destPath))
-        continue
-      }
-      fs.copyFileSync(src, destPath)
-      console.log('Wrote', path.relative(dest, destPath))
-    }
-
-    // update gamin-ui.json manifest in dest
-    const manifestPath = path.join(dest, 'gamin-ui.json')
-    let manifest = { installed: {} }
-    if (fs.existsSync(manifestPath)) {
-      try { manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8')) } catch (e) { /* ignore */ }
-    }
-    manifest.installed = manifest.installed || {}
-    manifest.installed[comp] = metadata.version || 'unknown'
-    fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2), 'utf8')
-    console.log('Updated manifest:', path.relative(dest, manifestPath))
-    // Optionally install dependencies
     const installFlag = argv.includes('--install')
-    if (installFlag) {
-      const deps = Array.isArray(metadata.dependencies) ? metadata.dependencies : []
-      if (deps.length > 0) {
-        console.log('Installing dependencies:', deps.join(', '))
-        try {
-          installDependencies(dest, deps)
-          console.log('Dependencies installed')
-        } catch (e) {
-          console.error('Dependency installation failed:', e.message || e)
-          process.exit(4)
-        }
-      } else {
-        console.log('No dependencies to install for', comp)
-      }
-    }
 
-    process.exit(0)
+    try {
+      await addComponent(comp, dest, installFlag)
+      process.exit(0)
+    } catch (err) {
+      console.error(err.message || err)
+      process.exit(1)
+    }
   }
 
   if (cmd === 'search') {
@@ -222,11 +247,6 @@ async function main() {
   usage()
 }
 
-main().catch(err => {
-  console.error(err)
-  process.exit(1)
-})
-
 function detectPackageManager(dest) {
   const { spawnSync } = require('child_process')
   const path = require('path')
@@ -246,7 +266,7 @@ function detectPackageManager(dest) {
   return 'npm'
 }
 
-function installDependencies(dest, deps) {
+function installDependencies(dest, deps, logger = console.log, stdioOpt = 'inherit') {
   const { spawnSync } = require('child_process')
   const pkg = detectPackageManager(dest)
   let cmd, args
@@ -260,8 +280,8 @@ function installDependencies(dest, deps) {
     cmd = 'npm'
     args = ['install', '--save', ...deps]
   }
-  console.log('Using package manager:', pkg)
-  const res = spawnSync(cmd, args, { cwd: dest, stdio: 'inherit', shell: false })
+  logger(`Using package manager: ${pkg}`)
+  const res = spawnSync(cmd, args, { cwd: dest, stdio: stdioOpt, shell: false })
   if (res.error) throw res.error
   if (res.status !== 0) throw new Error(`${cmd} ${args.join(' ')} failed with code ${res.status}`)
 }
@@ -293,4 +313,21 @@ function resolveRegistryPath(registryRoot, relativePath) {
     throw new Error(`Refusing unsafe registry path: ${relativePath}`)
   }
   return resolvedPath
+}
+
+// Only execute main if run directly from the command line
+if (require.main === module) {
+  main().catch(err => {
+    console.error(err)
+    process.exit(1)
+  })
+}
+
+module.exports = {
+  addComponent,
+  detectPackageManager,
+  installDependencies,
+  readManifest,
+  compareVersions,
+  resolveRegistryPath
 }
