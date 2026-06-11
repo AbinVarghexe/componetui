@@ -10,20 +10,25 @@ This document outlines the workflow, coding standards, and branch policies we us
 
 To ensure production stability, we follow a strict branching strategy:
 
-### 1. Main Branch Policy (`main`)
-- **Production Branch**: The `main` branch represents the stable production-ready code.
-- **Direct Commits Blocked**: Direct pushes to `main` are disabled. All changes must come through Pull Requests (PRs).
-- **PR Requirements**:
-  - **Code Review**: At least 1 approved review from a maintainer is required.
-  - **CI Checks**: The GitHub Actions test suite (`Validate and Test`) must pass successfully.
-  - **Deploy Previews**: A successful Vercel preview deployment must build without errors.
+### 1. Production Branch (`main`)
+- **Main Production Branch**: Represents the stable production-ready code deployed to users.
+- **Direct Commits Blocked**: Direct pushes are prohibited.
+- **Deployment**: Any merge into `main` triggers an automatic production build and deploy.
+- **Rules**: Require a pull request with at least 1 approved review and all CI status checks passing.
 
-### 2. Feature & Bugfix Branches
-- **Creation**: Always branch off the latest `main` branch.
-- **Naming Conventions**: Use descriptive branch prefixes:
-  - `feature/your-feature-name` (e.g. `feature/avatar-component`)
-  - `bugfix/issue-description` (e.g. `bugfix/cli-install-path`)
-  - `docs/what-changed` (e.g. `docs/typo-fix`)
+### 2. Testing & Integration Branch (`staging`)
+- **Staging / Testing Branch**: Used for integration testing of new features. All pull requests from developers should target `staging` first.
+- **Direct Commits Blocked**: Direct pushes are prohibited.
+- **Rules**: Require a pull request with all CI status checks passing.
+- **Release Flow**: Periodically, `staging` is merged into `main` via a release pull request to push changes to production.
+
+### 3. Feature, Bugfix & Sub-branches
+- **Creation**: Always branch off the latest `staging` branch.
+- **Naming Conventions**: Use descriptive prefixes:
+  - `feature/your-feature-name` (e.g., `feature/demo-button-update`)
+  - `bugfix/issue-description` (e.g., `bugfix/cli-install-path`)
+  - `docs/what-changed` (e.g., `docs/typo-fix`)
+- **Target Branch**: Submit pull requests targeting the `staging` branch.
 
 ---
 
