@@ -1,6 +1,7 @@
 "use client"
 import React from 'react'
 import { use } from 'react'
+import { notFound } from 'next/navigation'
 import { Bot, Construction, CheckCircle2 } from 'lucide-react'
 import { usePreview } from '../PreviewContext'
 import { getAllItems } from '../components/sidebar-data'
@@ -281,7 +282,9 @@ export default function SlugPage({ params }: { params: Promise<{ slug: string }>
   // Find the label from sidebar data for coming-soon items
   const allItems = getAllItems()
   const sidebarItem = allItems.find((item) => item.slug === slug)
-  const displayName = sidebarItem?.label || slug.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
 
-  return <ComingSoonPage name={displayName} />
+  // Slug not in sidebar data at all — trigger 404
+  if (!sidebarItem) notFound()
+
+  return <ComingSoonPage name={sidebarItem.label} />
 }
