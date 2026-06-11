@@ -1,0 +1,7 @@
+{
+  "id": "button",
+  "name": "Button",
+  "version": "1.0.0",
+  "frameworks": ["react", "next"],
+  "dependencies": ["lucide-react"]
+}

@@ -39,3 +39,15 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# agents and skills
+/.agents/
+/skills/
+
+# design and requirements documentation (kept locally, not on GitHub)
+/DESIGN.md
+/PRD.md
+
+# local testing/analysis outputs
+/tmp-project/
+/graphify-out/

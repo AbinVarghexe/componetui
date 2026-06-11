@@ -1,0 +1,9 @@
+{
+  "id": "pricing-card",
+  "name": "Pricing Card",
+  "version": "1.0.0",
+  "frameworks": ["react", "next"],
+  "dependencies": [],
+  "files": ["pricing-card.tsx"],
+  "description": "A simple pricing card component"
+}

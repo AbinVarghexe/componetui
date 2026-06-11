@@ -1,0 +1,20 @@
+{
+  "components": [
+    {
+      "id": "button",
+      "path": "button",
+      "version": "1.0.0"
+    },
+    {
+      "id": "hero-modern",
+      "path": "hero-modern",
+      "version": "1.1.0"
+    },
+    {
+      "id": "pricing-card",
+      "path": "pricing-card",
+      "version": "1.0.0"
+    }
+  ]
+}
+

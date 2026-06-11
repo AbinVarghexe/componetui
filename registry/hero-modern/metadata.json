@@ -1,0 +1,9 @@
+{
+  "id": "hero-modern",
+  "name": "Hero Modern",
+  "version": "1.1.0",
+  "frameworks": ["react", "next"],
+  "dependencies": ["framer-motion"],
+  "files": ["hero-modern.tsx"],
+  "description": "A modern hero section with headline and CTA"
+}
