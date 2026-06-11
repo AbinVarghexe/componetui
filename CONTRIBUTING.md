@@ -10,25 +10,25 @@ This document outlines the workflow, coding standards, and branch policies we us
 
 To ensure production stability, we follow a strict branching strategy:
 
-### 1. Production Branch (`main`)
-- **Main Production Branch**: Represents the stable production-ready code deployed to users.
-- **Direct Commits Blocked**: Direct pushes are prohibited.
-- **Deployment**: Any merge into `main` triggers an automatic production build and deploy.
+### 1. Production Branch (`production`)
+- **Current Production Branch**: Represents the current live production code to get deployed.
+- **Direct Commits Blocked**: Direct pushes are strictly prohibited.
 - **Rules**: Require a pull request with at least 1 approved review and all CI status checks passing.
+- **Deployment Flow**: Merges into `production` are only performed via a release Pull Request from the `main` branch once changes have been fully tested and integrated.
 
-### 2. Testing & Integration Branch (`staging`)
-- **Staging / Testing Branch**: Used for integration testing of new features. All pull requests from developers should target `staging` first.
-- **Direct Commits Blocked**: Direct pushes are prohibited.
-- **Rules**: Require a pull request with all CI status checks passing.
-- **Release Flow**: Periodically, `staging` is merged into `main` via a release pull request to push changes to production.
+### 2. Main Development & Integration Branch (`main`)
+- **Default Branch**: This is the branch for merging everything. All development, feature branch integration, and testing happen here first.
+- **Direct Commits Blocked**: Direct pushes are prohibited. All contributions must come via Pull Requests.
+- **Rules**: Require a pull request with all CI status checks passing and review approval.
+- **Target Branch**: All contributors must submit their pull requests targeting the `main` branch.
 
 ### 3. Feature, Bugfix & Sub-branches
-- **Creation**: Always branch off the latest `staging` branch.
+- **Creation**: Always branch off the latest `main` branch.
 - **Naming Conventions**: Use descriptive prefixes:
   - `feature/your-feature-name` (e.g., `feature/demo-button-update`)
   - `bugfix/issue-description` (e.g., `bugfix/cli-install-path`)
   - `docs/what-changed` (e.g., `docs/typo-fix`)
-- **Target Branch**: Submit pull requests targeting the `staging` branch.
+- **Target Branch**: Submit pull requests targeting the `main` branch.
 
 ---
 
