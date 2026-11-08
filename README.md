@@ -1,119 +1,134 @@
-# Gamin UI Registry Platform
+<p align="center">
+  <img src="assets/banner.svg" alt="Gamin UI - Source-First Component Registry Platform" width="100%" />
+</p>
 
-[![CI](https://github.com/AbinVarghexe/componetui/actions/workflows/ci.yml/badge.svg)](https://github.com/AbinVarghexe/componetui/actions/workflows/ci.yml)
-[![GitHub stars](https://img.shields.io/github/stars/AbinVarghexe/componetui.svg?style=social)](https://github.com/AbinVarghexe/componetui/stargazers)
-[![Vercel Deployment](https://img.shields.io/badge/Vercel-Deployed-black?logo=vercel)](https://vercel.com)
-[![Sponsor](https://img.shields.io/badge/Sponsor-GitHub%20Sponsors-ea4aaa?logo=github-sponsors)](https://github.com/sponsors/AbinVarghexe)
+<p align="center">
+  <strong>Source-First UI Registry and Developer CLI Distributing Animated React 19 & Tailwind CSS v4 Components</strong>
+</p>
 
-Source-first UI registry for creative developers. Gamin UI distributes components as editable React source code directly into local workspaces via CLI.
+<p align="center">
+  <a href="https://github.com/AbinVarghexe/componetui/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge" alt="License" /></a>
+  <a href="https://nextjs.org/"><img src="https://img.shields.io/badge/Next.js-16.2-black.svg?style=for-the-badge&logo=next.js&logoColor=white" alt="Next.js" /></a>
+  <a href="https://react.dev/"><img src="https://img.shields.io/badge/React-19.2-61DAFB.svg?style=for-the-badge&logo=react&logoColor=black" alt="React 19" /></a>
+  <a href="https://tailwindcss.com/"><img src="https://img.shields.io/badge/Tailwind-CSS%20v4-38BDF8.svg?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="Tailwind CSS v4" /></a>
+  <a href="https://www.framer.com/motion/"><img src="https://img.shields.io/badge/Motion-Framer%20Motion%2012-FF0055.svg?style=for-the-badge&logo=framer&logoColor=white" alt="Framer Motion" /></a>
+  <a href="https://github.com/sponsors/AbinVarghexe"><img src="https://img.shields.io/badge/Sponsor-GitHub%20Sponsors-EA4AAA.svg?style=for-the-badge&logo=github-sponsors&logoColor=white" alt="Sponsor" /></a>
+</p>
 
+---
 
-## What’s included
+## Overview
 
-- Registry content under `registry/`
-- API routes for listing, fetching, and searching components
-- CLI entrypoint: `gamin-ui`
-- Local preview page at `/preview`
-- Metadata validation and smoke tests
+**Gamin UI** (`componetui`) is a source-first component registry and developer CLI for creative engineers. Instead of installing monolithic npm packages that lock you into rigid abstraction layers, Gamin UI distributes components as editable React source files directly into your local workspace.
 
-## Quick start
+```
+       +---------------------------------------------+
+       |   Gamin UI Cloud Registry (Next.js 16)      |
+       |   - Metadata Validation (JSON Schema)       |
+       |   - Dynamic Search & Component Feed API     |
+       +----------------------+----------------------+
+                              |
+                              v
+       +---------------------------------------------+
+       |   Developer CLI: gamin-ui (bin/gamin-ui.js) |
+       |   - gamin-ui search <query>                 |
+       |   - gamin-ui add <component> --dest ./src   |
+       |   - gamin-ui upgrade --check                |
+       +----------------------+----------------------+
+                              |
+                              v
+       +---------------------------------------------+
+       |   Target Project Workspace Source Tree      |
+       |   - components/ui/button.tsx                |
+       |   - components/ui/hero-modern.tsx           |
+       +---------------------------------------------+
+```
 
-Install dependencies:
+---
+
+## What’s Included
+
+- **Registry Source Core**: Handcrafted modular components under `registry/`.
+- **Search & Distribution REST API**: Next.js route handlers for querying and fetching component sources.
+- **Interactive Component Playground**: Visual test harness at `/preview`.
+- **Automated Verification**: Strict metadata JSON schema validation (`ajv`) and smoke test suites.
+- **Standalone CLI**: Native Node.js CLI binary with dependency resolution.
+
+---
+
+## Quick Start
+
+### 1. Installation & Local Development
 
 ```bash
+# Clone the repository
+git clone https://github.com/AbinVarghexe/componetui.git
+cd componetui
+
+# Install dependencies
 pnpm install
+
+# Start the registry server & preview workbench
+pnpm dev
 ```
 
-Run the app:
+Visit:
+- `http://localhost:3000/preview` - Interactive Component Catalog
+- `http://localhost:3000/api/components` - Registry JSON Feed
+- `http://localhost:3000/api/search?q=hero` - Live Component Search
 
-```bash
-pnpm run dev
-```
+---
 
-Open:
+## CLI Usage
 
-- `http://localhost:3000/preview`
-- `http://localhost:3000/api/components`
-- `http://localhost:3000/api/search?q=hero`
-
-## CLI
-
-Search the registry:
-
+### Search Components
 ```bash
 node ./bin/gamin-ui.js search hero
 ```
 
-Add a component to a project:
-
+### Install Component into Project
 ```bash
 node ./bin/gamin-ui.js add button --dest ./my-project
 ```
 
-Add a component and install its declared dependencies:
-
+### Install with Auto-Dependency Resolution
 ```bash
 node ./bin/gamin-ui.js add hero-modern --dest ./my-project --install
 ```
 
-Check for updates:
-
+### Check & Apply Upgrades
 ```bash
+# Check if local components are outdated
 node ./bin/gamin-ui.js upgrade --check --dest ./my-project
-```
 
-Apply updates:
-
-```bash
+# Synchronize latest version
 node ./bin/gamin-ui.js upgrade --dest ./my-project
 ```
 
-## Registry format
+---
 
-Each component directory contains:
-
-- `metadata.json` with id, name, version, frameworks, dependencies, and file list
-- one or more source files such as `.tsx`
-
-Example paths:
-
-- `registry/button/metadata.json`
-- `registry/button/button.tsx`
-
-## Testing
-
-Run the smoke test suite:
+## Testing & Quality Assurance
 
 ```bash
-pnpm test
-```
-
-Run metadata validation only:
-
-```bash
+# Run metadata schema validation
 pnpm run validate:metadata
-```
 
-Run the combined release check:
+# Run end-to-end registry smoke tests
+pnpm test
 
-```bash
+# Full CI release verification check
 pnpm run release:check
 ```
 
-- Validate registry metadata.
-- Run smoke tests.
-- Verify `/preview` renders the registry components.
-- Verify `/api/components` and `/api/search` return the expected results.
-- Confirm `gamin-ui add`, `search`, and `upgrade` work against a clean temp project.
+---
 
-## Contributing
+## Contributing & Sponsorship
 
-We welcome contributions from the community! Please read our [Contributing Guide](CONTRIBUTING.md) to learn about our branching model, local development workflows, code standards, and how to submit pull requests.
-
-## Support & Sponsorship
-
-If Gamin UI helps speed up your development or you want to support our open-source efforts, please consider sponsoring the project:
+We welcome contributions from the community! Please read our [Contributing Guide](CONTRIBUTING.md) to learn about our code standards and pull request workflows.
 
 - **GitHub Sponsors**: [Sponsor @AbinVarghexe](https://github.com/sponsors/AbinVarghexe)
-- Star this repository to help others discover Gamin UI!
+- Star this repository to support the project!
 
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
